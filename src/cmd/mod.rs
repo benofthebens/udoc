@@ -9,3 +9,9 @@ pub struct Cmd {
     #[command(subcommand)]
     command: Commands
 }
+impl Cmd {
+    pub fn get_command(&self) -> &Commands {
+        &self.command
+    }
+
+}
