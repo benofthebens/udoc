@@ -1,3 +1,9 @@
+mod cmd;
+
+use clap::Parser;
+use crate::cmd::Cmd;
+
 fn main() {
-    println!("Hello, world!");
+    let cmd = Cmd::parse();
+    
 }
