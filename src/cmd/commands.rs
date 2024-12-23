@@ -45,8 +45,8 @@ mod tests {
             .expect("Unable to delete directory");
 
         Ok(())
+    }
 }
-
 impl Commands {
     pub fn execute(&self) -> io::Result<()>{
         match self {
