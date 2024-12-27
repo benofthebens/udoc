@@ -1,4 +1,6 @@
 mod cmd;
+mod config; 
+mod log; 
 
 use clap::Parser;
 use crate::cmd::Cmd;
