@@ -13,5 +13,4 @@ impl Cmd {
     pub fn get_command(&self) -> &Commands {
         &self.command
     }
-
 }
