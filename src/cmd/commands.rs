@@ -13,7 +13,11 @@ pub enum Commands {
     New {
         #[arg(short, long)]
         name: String
+    },
+    Update {
+        
     }
+    
 }
 
 #[cfg(test)]
@@ -27,7 +31,7 @@ mod tests {
     fn init_test() -> io::Result<()> {
 
         let test_name: String = "test".to_string();
-        let full_path = format!("{}/{}", test_path, test_name);
+        let full_path = format!("./{}", test_name);
         
         let udoc_path = format!("{}/.udoc", &full_path);
         let images_path = format!("{}/images", &full_path);
@@ -49,12 +53,14 @@ impl Commands {
      
     pub fn execute(&self) -> io::Result<()> {
         match self {
-            Commands::New { name } => Self::new(name)
+            Commands::New { name } => Self::new(name),
+            Commands::Update {} => Self::update(),
+
         }
     }
     
     pub fn new(name: &String) -> io::Result<()> {
-        
+        // Gets the current directory 
         let binding = std::env::current_dir()?;
         let root_path: Option<&str> = binding 
             .to_str();
@@ -66,15 +72,19 @@ impl Commands {
 
         let full_path: String = format!("{root_path}/{name}");
         let config_path: String = format!("{full_path}/.udoc");
-
+        // Creates the directory
         fs::create_dir(&full_path);
         fs::create_dir(format!("{}/.udoc", &full_path));
         fs::create_dir(format!("{}/images", &full_path));
         fs::create_dir(format!("{}/videos", &full_path));
-        
+        // Creates the files
         config::create_config(config_path);
-        log::create_log_file(&full_path);
+        log::create_log_file(&full_path, name);
 
+        Ok(())
+    }
+
+    pub fn update() -> io::Result<()> {
         Ok(())
     }
 }
