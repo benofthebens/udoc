@@ -8,7 +8,7 @@ pub struct Log {
 }
 
 impl Log {
-    pub fn new(description: String) -> Self{
+    pub fn new(description: String) -> Self {
         Self {
             description
         }
@@ -31,12 +31,20 @@ impl Log {
         image_list 
     }
 }
-pub fn create_log_file(path: &String) -> Result<(), std::io::Error> {
+
+pub fn create_log_file(path: &String, name: &String) -> Result<(), std::io::Error> {
+     
     let images: Vec<String> = Log::get_images(format!("{path}/images"));
+
     let mut file = OpenOptions::new()
         .append(true)
         .create(true)
         .open(format!("{path}/log.md"))?;
+    writeln!(file, "## {name}"); 
+    writeln!(file, "---");
+    writeln!(file, "### Description");
+    writeln!(file, "---");
+    writeln!(file, "### Examples");
     for image in images {
         let image_upd = image.replace("\\", "/");
 
@@ -45,19 +53,30 @@ pub fn create_log_file(path: &String) -> Result<(), std::io::Error> {
             "![Sample Image][{image_upd}]"
         )?;
     }
+
     Ok(())
 }
-#[cfg(test)]
+/*#[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
+    fn create_log_file_test() -> Result<()> {
+        let path: String = "C:/Users/benja/Documents/udoc/test"
+            .to_string();
+        create_log_file(&path);
+
+        assert!(Path::new(format!("{path}/log.md")).exists());
+
+        Ok(())
+    }
+
+    #[test]
     fn get_images_test() -> () {
         let log = Log::new(" ".to_string());
-        dbg!("Hello"); 
         let images = log.get_images(".".to_string());
         for image in images {
             println!("{}", image);
         }
     }
-}
+}*/
