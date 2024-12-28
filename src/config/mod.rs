@@ -21,7 +21,9 @@ mod tests {
     #[test]
     fn read_config_test() -> Result<()> {
         
-        let config: Config = read_config("./test/.udoc/config.json".to_string());
+        let config: Config = read_config(
+            "./test/.udoc/config.json".to_string()
+        );
 
         assert_eq!(config.version, 1);
         assert_eq!(config.log_file_name, "log.md".to_string());
@@ -38,9 +40,7 @@ mod tests {
         Ok(()) 
     }
 }
-pub fn read_config(name: String) -> Config {
-
-    let full_path = format!("./{}", &name);
+pub fn read_config(full_path: String) -> Config {
     let config_str: String = fs::read_to_string(full_path)
         .expect("Unable to read file");
     let config: Config = serde_json::from_str(&config_str)
