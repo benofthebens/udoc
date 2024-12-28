@@ -1,5 +1,6 @@
 use std::io; 
 use std::fs;
+use std::fs::OpenOptions;
 
 pub struct Log {
     description: String,
@@ -12,7 +13,7 @@ impl Log {
         }
     }
 
-    pub fn get_images(&self, path: String) -> Vec<String> {
+    pub fn get_images(path: String) -> Vec<String> {
         let images = fs::read_dir(path)
             .expect("Unable to read directory");
         let mut image_list = vec![];
@@ -29,11 +30,19 @@ impl Log {
         image_list 
     }
 }
-pub fn create_log_file(path: &String) -> () {
-        fs::write(
-            format!("{path}/log.md"), 
-            "".to_string()
-        );
+pub fn create_log_file(path: &String) -> Result<()> {
+    let images: Vec<String> = Log::get_images(format!("{path}/images"));
+    let mut file = OpenOptions::new()
+        .append(true)
+        .create(true)
+        .open(format!("{path}/log.md"));
+    for image in images {
+        writeln!(
+            file,
+            format!("![Sample Image][{path}/images/{image}]")
+        )?;
+    }
+    Ok(())
 }
 #[cfg(test)]
 mod tests {
