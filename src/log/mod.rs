@@ -1,6 +1,7 @@
 use std::io; 
 use std::fs;
 use std::fs::OpenOptions;
+use std::io::Write;
 
 pub struct Log {
     description: String,
@@ -30,16 +31,18 @@ impl Log {
         image_list 
     }
 }
-pub fn create_log_file(path: &String) -> Result<()> {
+pub fn create_log_file(path: &String) -> Result<(), std::io::Error> {
     let images: Vec<String> = Log::get_images(format!("{path}/images"));
     let mut file = OpenOptions::new()
         .append(true)
         .create(true)
-        .open(format!("{path}/log.md"));
+        .open(format!("{path}/log.md"))?;
     for image in images {
+        let image_upd = image.replace("\\", "/");
+
         writeln!(
             file,
-            format!("![Sample Image][{path}/images/{image}]")
+            "![Sample Image][{image_upd}]"
         )?;
     }
     Ok(())
