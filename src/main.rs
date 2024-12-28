@@ -6,7 +6,7 @@ use clap::Parser;
 use crate::cmd::Cmd;
 
 fn main() {
-    let path: String = "err".to_string();
+    let cmd = Cmd::parse();
+    cmd.get_command().execute();
 
-    log::create_log_file(&path);
 }
