@@ -24,35 +24,6 @@ pub enum Commands {
     
 }
 
-#[cfg(test)]
-mod tests {
-
-    use super::*;
-    use std::fs;
-    use std::path::Path;
-
-    #[test]
-    fn init_test() -> io::Result<()> {
-
-        let test_name: String = "test".to_string();
-        let full_path = format!("./{}", test_name);
-        
-        let udoc_path = format!("{}/.udoc", &full_path);
-        let images_path = format!("{}/images", &full_path);
-        let videos_path = format!("{}/videos", &full_path);
-        let log_file = format!("{}/log.md", &full_path);
-
-        Commands::new(&test_name);
-        
-        assert!(Path::new(&full_path).exists());
-        assert!(Path::new(&udoc_path).exists());
-        assert!(Path::new(&images_path).exists());
-        assert!(Path::new(&videos_path).exists());
-        assert!(Path::new(&log_file).exists());
-
-        Ok(())
-    }
-}
 impl Commands {
      
     pub fn execute(&self) -> io::Result<()> {
@@ -114,3 +85,44 @@ impl Commands {
     }
 }
 
+#[cfg(test)]
+mod tests {
+
+    use super::*;
+    use std::fs;
+    use std::path::Path;
+
+    fn setup() -> () {
+
+    }
+    fn destroy(name: String) -> () {
+        std::fs::remove_dir_all(name);
+        ()
+    }
+
+    #[test]
+    fn init_test() -> io::Result<()> {
+
+        let test_name: String = "test".to_string();
+        let date = Local::now()
+            .date_naive();       
+        let full_path = format!("./{test_name}-{date}");
+
+        let udoc_path = format!("{}/.udoc", &full_path);
+        let images_path = format!("{}/images", &full_path);
+        let videos_path = format!("{}/videos", &full_path);
+        let log_file = format!("{}/log.md", &full_path);
+
+        Commands::new(&test_name, &String::new());
+
+        assert!(Path::new(&full_path).exists());
+        assert!(Path::new(&udoc_path).exists());
+        assert!(Path::new(&images_path).exists());
+        assert!(Path::new(&videos_path).exists());
+        assert!(Path::new(&log_file).exists());
+        
+        destroy(format!("{test_name}-{date}"));
+
+        Ok(())
+    }
+}

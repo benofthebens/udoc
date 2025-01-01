@@ -4,36 +4,26 @@ use std::fs::OpenOptions;
 use std::io::Write;
 use std::fs::File;
 use std::path::Path;
-pub struct Log {
-    description: String,
-}
 
-impl Log {
-    pub fn new(description: String) -> Self {
-        Self {
-            description
-        }
-   }
-
-    pub fn get_images(path: String) -> Vec<String> {
-        let images = fs::read_dir(path)
-            .expect("Unable to read directory");
-        let mut image_list = vec![];
+    
+pub fn get_images(path: String) -> Vec<String> {
+    let images = fs::read_dir(path)
+        .expect("Unable to read directory");
+    let mut image_list = vec![];
         
-        for image in images {
-            let entry = image
-                .expect("Unable to get image")
-                .path();
-            if entry.extension().map(|s| s != "png").unwrap() {
-                panic!("Incorrect file type for Image");
-            }
-            image_list.push(entry
+    for image in images {
+        let entry = image
+            .expect("Unable to get image")
+            .path();
+         if entry.extension().map(|s| s != "png").unwrap() {
+            panic!("Incorrect file type for Image");
+         }
+         image_list.push(entry
                 .into_os_string()
                 .into_string()
                 .unwrap());
-        }
-        image_list 
     }
+    image_list 
 }
 
 pub fn create_log_file(
@@ -60,7 +50,7 @@ pub fn update_images (
     path: &String
     ) -> Result<(), std::io::Error> {
 
-    let images: Vec<String> = Log::get_images(format!("{path}/images"));
+    let images: Vec<String> = get_images(format!("{path}/images"));
     for image in images {
         let image_upd = image.replace("\\", "/");
 
@@ -73,27 +63,29 @@ pub fn update_images (
     Ok(())
 }
 
-/*#[cfg(test)]
+#[cfg(test)]
 mod tests {
     use super::*;
+    fn setup() -> () {
+        std::fs::create_dir("test");
+        std::fs::create_dir("test/images");
+        std::fs::create_dir(".udoc");
 
+    }
+    fn destroy() -> () {
+        std::fs::remove_dir_all("test");
+    }
     #[test]
-    fn create_log_file_test() -> Result<()> {
+    fn create_log_file_test() ->() {
+        setup();
+
         let path: String = "C:/Users/benja/Documents/udoc/test"
             .to_string();
-        create_log_file(&path);
+        create_log_file(&path, &"err".to_string(), &String::new());
 
-        assert!(Path::new(format!("{path}/log.md")).exists());
+        assert!(Path::new(&format!("{path}/log.md")).exists());
 
-        Ok(())
+        destroy();
+
     }
-
-    #[test]
-    fn get_images_test() -> () {
-        let log = Log::new(" ".to_string());
-        let images = log.get_images(".".to_string());
-        for image in images {
-            println!("{}", image);
-        }
-    }
-}*/
+}
