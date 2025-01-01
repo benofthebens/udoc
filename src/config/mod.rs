@@ -9,8 +9,8 @@ use serde_json::{Result, Value};
 pub struct Config {
     version: u8,
     log_file_name: String, 
-    images_dir: String, 
-    videos_dir: String, 
+    pub images_dir: String, 
+    pub videos_dir: String, 
 }
 
 pub fn read_config(full_path: String) -> Config {
@@ -22,7 +22,7 @@ pub fn read_config(full_path: String) -> Config {
     config
 }
 
-pub fn create_config(file_path: String) -> Result<()> {
+pub fn create_config(file_path: &String) -> Result<()> {
 
     let default_config = r#"{
     "version": 1,
@@ -58,7 +58,7 @@ mod tests {
     #[test]
     fn read_config_test() -> Result<()> {
         init();
-        create_config("./test".to_string());
+        create_config(&"./test".to_string());
 
         let config: Config = read_config(
             "./test/.udoc/config.json".to_string()
@@ -77,7 +77,7 @@ mod tests {
     fn create_config_test() -> Result<()> {
         init();
 
-        create_config("./test/.udoc".to_string());
+        create_config(&"./test/.udoc".to_string());
 
         assert!(Path::new("./test/.udoc/config.json").exists());
 

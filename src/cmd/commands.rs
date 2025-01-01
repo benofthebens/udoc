@@ -48,13 +48,22 @@ impl Commands {
 
         let full_path: String = format!("{root_path}/{error_name}");
         let config_path: String = format!("{full_path}/.udoc");
+
+        config::create_config(&config_path);
+        let config_file = config::read_config(
+            format!("{config_path}/config.json")
+        );
+
+        let images_dir = config_file.images_dir;
+        let videos_dir = config_file.videos_dir;
+
         // Creates the directory
         fs::create_dir(&full_path);
-        fs::create_dir(format!("{}/.udoc", &full_path));
-        fs::create_dir(format!("{}/images", &full_path));
-        fs::create_dir(format!("{}/videos", &full_path));
+        fs::create_dir(format!("{full_path}/.udoc"));
+        fs::create_dir(format!("{full_path}/{images_dir}"));
+        fs::create_dir(format!("{full_path}/{videos_dir}"));
+        
         // Creates the files
-        config::create_config(config_path);
         log::create_log_file(&full_path, &error_name, description);
 
         Ok(())
