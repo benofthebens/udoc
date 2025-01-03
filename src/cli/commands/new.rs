@@ -2,7 +2,22 @@ use std::{fs, io};
 use chrono::Local;
 use crate::{config, log};
 use crate::config::{Config, User};
-
+//! This module initialises an udoc repository creating the directories and files
+/// This takes in the arguments from the cli finds the current directory
+/// creates a name which includes the __name__ parameter and the current date
+/// initialises all paths for a common udoc repo.
+///
+/// ## Example
+/// ```
+/// /*
+///  * To create a udoc repository with:
+///  * name: 'err-CURRENT-DATE'
+///  * description: 'This is a description'
+///  * image_dir_name: 'images'
+///  * video_dir_name: 'videos'
+///  */
+/// new("err","This is a description", "images", "videos");
+/// ```
 pub fn new(
 	name: &String,
 	description: &String,
@@ -27,6 +42,8 @@ pub fn new(
 	// Creates the directory
 	fs::create_dir(&root_path).expect("TODO: panic message");
 	fs::create_dir(&data_path).expect("TODO: panic message");
+	fs::create_dir(&image_path).expect("TODO: panic message");
+	fs::create_dir(&video_path).expect("TODO: panic message");
 
 	config::create_config(
 		&config_path,
@@ -41,9 +58,6 @@ pub fn new(
 			},
 		),
 	).expect("TODO: panic message");
-
-	fs::create_dir(&image_path).expect("TODO: panic message");
-	fs::create_dir(&video_path).expect("TODO: panic message");
 
 	// Creates the files
 	log::create_log_file(&root_path, &error_name, description)
