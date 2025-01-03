@@ -1,14 +1,14 @@
-use std::fs::File;
+use crate::config;
+use crate::config::Config;
+use crate::config::User;
+use crate::log;
+use chrono::prelude::*;
+use clap::Subcommand;
 use std::fs;
+use std::fs::File;
+use std::fs::OpenOptions;
 use std::io;
 use std::path::Path;
-use clap::Subcommand;
-use std::fs::OpenOptions;
-use crate::config::Config;
-use crate::config;
-use crate::log; 
-use chrono::prelude::*;
-use crate::config::User;
 
 #[derive(Subcommand, Debug)]
 pub enum Commands {
@@ -26,25 +26,25 @@ pub enum Commands {
         video_dir_name: String,
 
         #[arg(short, long, default_value_t = 1)]
-        error_number: u8
+        error_number: u8,
     },
     Update,
     Config {
         #[command(subcommand)]
-        cmd: ConfigCommands
+        cmd: ConfigCommands,
     },
-    Reset
+    Reset,
 }
 #[derive(Subcommand, Debug)]
 pub enum ConfigCommands {
     Name {
         #[arg(short, long)]
-        name: String
+        name: String,
     },
     Email {
-        #[arg(short, long)] 
-        email: String
-    }
+        #[arg(short, long)]
+        email: String,
+    },
 }
 impl ConfigCommands {
     pub fn execute(&self) -> io::Result<()> {
@@ -55,55 +55,43 @@ impl ConfigCommands {
     }
     pub fn set_config_name(name: &String) -> io::Result<()> {
         if !Path::new("./.udoc").exists() {
-            panic!("This path is not a udoc repository"); 
+            panic!("This path is not a udoc repository");
         }
-        
-        let mut config_json: Config = config::read_config(
-            "./.udoc/config.json".to_string()
-        );
+
+        let mut config_json: Config = config::read_config("./.udoc/config.json".to_string());
         config_json.user.username = name.to_string();
         std::fs::remove_file("./.udoc/config.json")?;
-        config::create_config(
-            &"./.udoc".to_string(),
-            config_json
-        ); 
+        config::create_config(&"./.udoc".to_string(), config_json);
 
         Ok(())
     }
     pub fn set_config_email(email: &String) -> io::Result<()> {
         if !Path::new("./.udoc").exists() {
-            panic!("This path is not a udoc repository"); 
+            panic!("This path is not a udoc repository");
         }
 
-        let mut config_json: Config = config::read_config(
-            "./.udoc/config.json".to_string()
-        );
+        let mut config_json: Config = config::read_config("./.udoc/config.json".to_string());
         config_json.user.email = email.to_string();
-        config::create_config(
-            &"./.udoc".to_string(),
-            config_json
-        ); 
+        config::create_config(&"./.udoc".to_string(), config_json);
 
         Ok(())
     }
-
 }
 impl Commands {
-     
     pub fn execute(&self) -> io::Result<()> {
         match self {
             Commands::New {
-                name, 
-                description, 
-                image_dir_name, 
-                video_dir_name, 
-                error_number 
-            } => Self::new(
-                name, 
+                name,
                 description,
                 image_dir_name,
                 video_dir_name,
-                error_number
+                error_number,
+            } => Self::new(
+                name,
+                description,
+                image_dir_name,
+                video_dir_name,
+                error_number,
             ),
             Commands::Update {} => Self::update(),
             Commands::Config { cmd } => cmd.execute(),
@@ -114,8 +102,7 @@ impl Commands {
         if !Path::new("./.udoc").exists() {
             panic!("This is not a udoc repository ");
         }
-        fs::remove_dir_all("./.udoc")
-            .expect("TODO: panic message");
+        fs::remove_dir_all("./.udoc").expect("TODO: panic message");
         fs::create_dir("./.udoc");
 
         config::create_config(
@@ -127,29 +114,29 @@ impl Commands {
                 "videos".to_string(),
                 User {
                     username: String::new(),
-                    email: String::new()
-                }
-            )
-        ).expect("TODO: panic message");
+                    email: String::new(),
+                },
+            ),
+        )
+        .expect("TODO: panic message");
 
         Ok(())
     }
     pub fn new(
-        name: &String, 
-        description: &String, 
-        image_dir_name: &String, 
-        video_dir_name: &String, 
-        error_number: &u8) -> io::Result<()> {
-        // Gets the current directory 
+        name: &String,
+        description: &String,
+        image_dir_name: &String,
+        video_dir_name: &String,
+        error_number: &u8,
+    ) -> io::Result<()> {
+        // Gets the current directory
         let binding = std::env::current_dir()?;
-        let root_path: Option<&str> = binding 
-            .to_str();
-        let date = Local::now()
-            .date_naive(); 
+        let root_path: Option<&str> = binding.to_str();
+        let date = Local::now().date_naive();
         let error_name = format!("{name}-{date}");
         let root_path: &str = match root_path {
-            Some(path) => path, 
-            None => panic!("Path provided is None") 
+            Some(path) => path,
+            None => panic!("Path provided is None"),
         };
 
         let full_path: String = format!("{root_path}/{error_name}");
@@ -161,26 +148,24 @@ impl Commands {
         config::create_config(
             &config_path,
             Config::new(
-                1, 
-                "log.md".to_string(), 
+                1,
+                "log.md".to_string(),
                 format!("{image_dir_name}"),
                 format!("{video_dir_name}"),
                 User {
                     username: String::new(),
-                    email: String::new()
-                }
-            )
+                    email: String::new(),
+                },
+            ),
         );
-        let config_file = config::read_config(
-            format!("{config_path}/config.json")
-        );
+        let config_file = config::read_config(format!("{config_path}/config.json"));
 
         let images_dir = config_file.images_dir;
         let videos_dir = config_file.videos_dir;
 
         fs::create_dir(format!("{full_path}/{images_dir}"));
         fs::create_dir(format!("{full_path}/{videos_dir}"));
-        
+
         // Creates the files
         log::create_log_file(&full_path, &error_name, description);
 
@@ -191,20 +176,19 @@ impl Commands {
         let binding = std::env::current_dir()?;
         let path: Option<&str> = binding.to_str();
         let path: &str = match path {
-            Some(path) => path, 
-            None => panic!("Path provided is None")
+            Some(path) => path,
+            None => panic!("Path provided is None"),
         };
         let config_path = format!("{path}/.udoc");
-        let config_json = config::read_config(
-            format!("{config_path}/config.json"));
+        let config_json = config::read_config(format!("{config_path}/config.json"));
         if !Path::new(&config_path).exists() {
-            panic!("This path is not a udoc repository"); 
-        }
-        else if config_json.user.email == String::new() || 
-            config_json.user.username == String::new() {
+            panic!("This path is not a udoc repository");
+        } else if config_json.user.email == String::new()
+            || config_json.user.username == String::new()
+        {
             panic!("Please choose give your name and email");
         }
-        
+
         let mut file = OpenOptions::new()
             .append(true)
             .create(true)
@@ -224,9 +208,7 @@ mod tests {
     use std::fs;
     use std::path::Path;
 
-    fn setup() -> () {
-
-    }
+    fn setup() -> () {}
     fn destroy(name: String) -> () {
         std::fs::remove_dir_all(name);
         ()
@@ -234,10 +216,8 @@ mod tests {
 
     #[test]
     fn init_test() -> io::Result<()> {
-
         let test_name: String = "test".to_string();
-        let date = Local::now()
-            .date_naive();       
+        let date = Local::now().date_naive();
         let full_path = format!("./{test_name}-{date}");
 
         let udoc_path = format!("{}/.udoc", &full_path);
@@ -252,7 +232,7 @@ mod tests {
         assert!(Path::new(&images_path).exists());
         assert!(Path::new(&videos_path).exists());
         assert!(Path::new(&log_file).exists());
-        
+
         destroy(format!("{test_name}-{date}"));
 
         Ok(())

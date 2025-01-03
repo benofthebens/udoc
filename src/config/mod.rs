@@ -1,7 +1,7 @@
-use std::io;
+use std::fmt;
 use std::fs;
+use std::io;
 use std::path::Path;
-use std::fmt; 
 
 use serde::Serialize;
 
@@ -13,43 +13,39 @@ pub use crate::config::user::User;
 #[derive(Deserialize, Serialize, Debug)]
 pub struct Config {
     pub version: u8,
-    pub log_file_name: String, 
-    pub images_dir: String, 
-    pub videos_dir: String, 
-    pub user: User
+    pub log_file_name: String,
+    pub images_dir: String,
+    pub videos_dir: String,
+    pub user: User,
 }
 impl Config {
     pub fn new(
-        version: u8, 
-        log_file_name: String, 
-        images_dir: String, 
+        version: u8,
+        log_file_name: String,
+        images_dir: String,
         videos_dir: String,
-        user: User
-        ) -> Self {
+        user: User,
+    ) -> Self {
         Self {
             version,
             log_file_name,
             images_dir,
             videos_dir,
-            user 
+            user,
         }
     }
 }
 pub fn read_config(full_path: String) -> Config {
-    let config_str: String = fs::read_to_string(full_path)
-        .expect("Unable to read file");
-    let config: Config = serde_json::from_str(&config_str)
-        .expect("Unable to convert to Config struct");
+    let config_str: String = fs::read_to_string(full_path).expect("Unable to read file");
+    let config: Config =
+        serde_json::from_str(&config_str).expect("Unable to convert to Config struct");
     config
 }
 
-pub fn create_config(
-    file_path: &String, 
-    config: Config) -> Result<()> {
-
+pub fn create_config(file_path: &String, config: Config) -> Result<()> {
     fs::write(
-        format!("{file_path}/config.json"), 
-        serde_json::to_string_pretty(&config).unwrap()
+        format!("{file_path}/config.json"),
+        serde_json::to_string_pretty(&config).unwrap(),
     );
 
     Ok(())
@@ -57,7 +53,7 @@ pub fn create_config(
 
 /*#[cfg(test)]
 mod tests {
-    
+
     use super::*;
     fn init() -> () {
         let root_path = "./test";
@@ -67,7 +63,7 @@ mod tests {
         std::fs::create_dir("./test");
         std::fs::create_dir("./test/.udoc");
 
-        return (); 
+        return ();
     }
     fn remove_files() -> (){
         std::fs::remove_dir_all("./test");
@@ -91,7 +87,7 @@ mod tests {
         remove_files();
         Ok(())
     }
-    
+
     #[test]
     fn create_config_test() -> Result<()> {
         init();
@@ -100,7 +96,7 @@ mod tests {
 
         assert!(Path::new("./test/.udoc/config.json").exists());
 
-        Ok(()) 
+        Ok(())
     }
 }
 */

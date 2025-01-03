@@ -1,9 +1,9 @@
 mod cmd;
-mod config; 
-mod log; 
+mod config;
+mod log;
 
-use clap::Parser;
 use crate::cmd::Cmd;
+use clap::Parser;
 
 fn main() {
     let cmd = Cmd::parse();

@@ -1,2 +1,1 @@
-pub fn setup() -> () {
-}
+pub fn setup() -> () {}
