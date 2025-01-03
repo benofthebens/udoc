@@ -28,14 +28,12 @@ pub enum Commands {
         #[arg(short, long, default_value_t = 1)]
         error_number: u8
     },
-    Update {
-        
-    },
+    Update,
     Config {
         #[command(subcommand)]
         cmd: ConfigCommands
-    }
-    
+    },
+    Reset
 }
 #[derive(Subcommand, Debug)]
 pub enum ConfigCommands {
@@ -108,10 +106,34 @@ impl Commands {
                 error_number
             ),
             Commands::Update {} => Self::update(),
-            Commands::Config { cmd } => cmd.execute()
+            Commands::Config { cmd } => cmd.execute(),
+            Commands::Reset => Self::reset(),
         }
     }
-    
+    pub fn reset() -> io::Result<()> {
+        if !Path::new("./.udoc").exists() {
+            panic!("This is not a udoc repository ");
+        }
+        fs::remove_dir_all("./.udoc")
+            .expect("TODO: panic message");
+        fs::create_dir("./.udoc");
+
+        config::create_config(
+            &"./.udoc".to_string(),
+            Config::new(
+                1,
+                "log.md".to_string(),
+                "images".to_string(),
+                "videos".to_string(),
+                User {
+                    username: String::new(),
+                    email: String::new()
+                }
+            )
+        ).expect("TODO: panic message");
+
+        Ok(())
+    }
     pub fn new(
         name: &String, 
         description: &String, 
