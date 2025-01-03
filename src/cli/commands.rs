@@ -7,12 +7,9 @@ use crate::cli::commands::config::ConfigCommands;
 use crate::cli::commands::new::new;
 use crate::cli::commands::update::update;
 use crate::cli::commands::reset::reset;
-
 use chrono::prelude::*;
 use clap::Subcommand;
-
 use std::io;
-use std::path::Path;
 
 #[derive(Subcommand, Debug)]
 pub enum Commands {
