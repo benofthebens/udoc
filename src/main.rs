@@ -1,8 +1,8 @@
-mod cmd;
+mod cli;
 mod config;
 mod log;
 
-use crate::cmd::Cmd;
+use crate::cli::Cmd;
 use clap::Parser;
 
 fn main() {

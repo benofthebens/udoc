@@ -1,15 +1,15 @@
 mod commands;
 
-use crate::cmd::commands::Commands;
+use crate::cli::commands::Commands;
 use clap::Parser;
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
-pub struct Cmd {
+pub struct Cli {
     #[command(subcommand)]
     command: Commands,
 }
-impl Cmd {
+impl Cli {
     pub fn get_command(&self) -> &Commands {
         &self.command
     }
