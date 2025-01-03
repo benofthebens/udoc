@@ -2,7 +2,12 @@ use std::{fs, io};
 use std::path::Path;
 use crate::config;
 use crate::config::{Config, User};
-
+//! This module is the implementation for the reset command
+/// > This function removes the directory and all it's contents
+/// recreates the directory and config
+///
+/// # Panics
+/// - If the current directory is not an udoc repository
 pub fn reset() -> io::Result<()> {
 	let binding = std::env::current_dir()?;
 	let root_path = binding.to_str().unwrap();
