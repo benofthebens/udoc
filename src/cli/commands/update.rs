@@ -3,6 +3,24 @@ use std::io;
 use std::path::Path;
 use crate::{config, log};
 
+//! This module is for the implementation for the update command
+
+/// >This function assumes that you are already inside an udoc repository checks who you are
+/// checks if there are any new images in the image directory and updates the log.md accordingly.
+/// ## Todo
+/// - TODO: Ensure that when an image is gone from the images dir it is deleted (user-story #8)
+/// - TODO: Video update implementation
+/// ## Example
+/// ```
+/// // Cmd: udoc update
+/// // images: img.png
+/// // config.name: ben
+/// // config.email: email@email.com
+/// assert_eq!(Ok(()), update()); // log.md is updated
+/// ```
+/// ## Panics
+/// - Panics if the current directory is _not_ a repo
+/// - Panics if no _email or name_ is given in the config file
 pub fn update() -> io::Result<()> {
 
 	let binding = std::env::current_dir()?;
