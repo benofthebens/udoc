@@ -116,6 +116,8 @@ impl Commands {
         }
         fs::remove_dir_all("./.udoc")
             .expect("TODO: panic message");
+        fs::create_dir("./.udoc");
+
         config::create_config(
             &"./.udoc".to_string(),
             Config::new(
