@@ -1,5 +1,6 @@
 mod name;
 mod email;
+
 use std::io;
 use crate::cli::commands::config::name::set_config_name;
 use crate::cli::commands::config::email::set_config_email;
