@@ -12,14 +12,15 @@ use clap::Subcommand;
 use std::io;
 //! This module is to map the subcommands enums to their corresponding functions
 
-/// Represents the different subcommand variants with their corresponding arguments
+/// > Represents the different subcommand variants with their corresponding arguments
 ///
 /// ## Example
 /// ```
 /// - udoc new --name <name-of-error>
 ///            --description <description-of-error>
 ///            --image_dir_name <image-directory>
-///            --video_dir_name <video-directory> <error_number>
+///            --video_dir_name <video-directory>
+///            --error_number <error_number>
 /// - udoc update
 /// - udoc config <config-subcommand>
 /// - udoc reset
