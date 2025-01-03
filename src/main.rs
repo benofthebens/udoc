@@ -8,5 +8,4 @@ use crate::cmd::Cmd;
 fn main() {
     let cmd = Cmd::parse();
     cmd.get_command().execute();
-
 }
