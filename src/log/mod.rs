@@ -4,8 +4,9 @@ use std::fs::OpenOptions;
 use std::io::Write;
 use std::fs::File;
 use std::path::Path;
+use crate::config::Config;
+use crate::config;
 
-    
 pub fn get_images(path: String) -> Vec<String> {
     let images = fs::read_dir(path)
         .expect("Unable to read directory");
@@ -49,8 +50,14 @@ pub fn update_images (
     file: &mut File,
     path: &String
     ) -> Result<(), std::io::Error> {
+    let config: Config = config::read_config(
+        format!("{path}/.udoc/config.json")
+    );
+    let image_dir = config.images_dir;
 
-    let images: Vec<String> = get_images(format!("{path}/images"));
+    let images: Vec<String> = get_images(
+        format!("{path}/{image_dir}")
+    );
     for image in images {
         let image_upd = image.replace("\\", "/");
 
