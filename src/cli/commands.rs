@@ -10,7 +10,20 @@ use crate::cli::commands::reset::reset;
 use chrono::prelude::*;
 use clap::Subcommand;
 use std::io;
+//! This module is to map the subcommands enums to their corresponding functions
 
+/// Represents the different subcommand variants with their corresponding arguments
+///
+/// ## Example
+/// ```
+/// - udoc new --name <name-of-error>
+///            --description <description-of-error>
+///            --image_dir_name <image-directory>
+///            --video_dir_name <video-directory> <error_number>
+/// - udoc update
+/// - udoc config <config-subcommand>
+/// - udoc reset
+/// ```
 #[derive(Subcommand, Debug)]
 pub enum Commands {
     New {
@@ -37,6 +50,14 @@ pub enum Commands {
     Reset,
 }
 impl Commands {
+    /// Maps the command to corresponding function
+    ///
+    /// ## Example
+    /// ```
+    /// // Cmd: `udoc new -n err`
+    /// // Maps to: `New` enum variant
+    /// // executes: `new("err", "", "", 1)`
+    /// ```
     pub fn execute(&self) -> io::Result<()> {
         match self {
             Commands::New {
