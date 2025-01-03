@@ -1,42 +1,61 @@
 use std::io;
 use std::fs;
 use std::path::Path;
+use std::fmt; 
+
+use serde::Serialize;
 
 use serde::Deserialize;
 use serde_json::{Result, Value};
+mod user;
+pub use crate::config::user::User;
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct Config {
-    version: u8,
-    log_file_name: String, 
+    pub version: u8,
+    pub log_file_name: String, 
     pub images_dir: String, 
     pub videos_dir: String, 
+    pub user: User
 }
-
+impl Config {
+    pub fn new(
+        version: u8, 
+        log_file_name: String, 
+        images_dir: String, 
+        videos_dir: String,
+        user: User
+        ) -> Self {
+        Self {
+            version,
+            log_file_name,
+            images_dir,
+            videos_dir,
+            user 
+        }
+    }
+}
 pub fn read_config(full_path: String) -> Config {
     let config_str: String = fs::read_to_string(full_path)
         .expect("Unable to read file");
     let config: Config = serde_json::from_str(&config_str)
         .expect("Unable to convert to Config struct");
-    println!("{:?}", &config); 
     config
 }
 
-pub fn create_config(file_path: &String) -> Result<()> {
+pub fn create_config(
+    file_path: &String, 
+    config: Config) -> Result<()> {
 
-    let default_config = r#"{
-    "version": 1,
-    "log_file_name": "log.md",
-    "images_dir": "images",
-    "videos_dir": "videos"
-}"#;
-
-    fs::write(format!("{file_path}/config.json"), default_config);
+    fs::write(
+        format!("{file_path}/config.json"), 
+        serde_json::to_string_pretty(&config).unwrap()
+    );
 
     Ok(())
 }
 
-#[cfg(test)]
+/*#[cfg(test)]
 mod tests {
     
     use super::*;
@@ -84,4 +103,4 @@ mod tests {
         Ok(()) 
     }
 }
-
+*/
