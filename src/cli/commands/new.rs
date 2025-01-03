@@ -10,45 +10,44 @@ pub fn new(
 	video_dir_name: &String,
 	error_number: &u8,
 ) -> io::Result<()> {
+
 	// Gets the current directory
 	let binding = std::env::current_dir()?;
-	let root_path: Option<&str> = binding.to_str();
+	let environment_path: &str = binding.to_str().unwrap();
+
 	let date = Local::now().date_naive();
 	let error_name = format!("{name}-{date}");
-	let root_path: &str = match root_path {
-		Some(path) => path,
-		None => panic!("Path provided is None"),
-	};
 
-	let full_path: String = format!("{root_path}/{error_name}");
-	let config_path: String = format!("{full_path}/.udoc");
+	let root_path: String = format!("{environment_path}/{error_name}");
+	let data_path: String = format!("{root_path}/.udoc");
+	let config_path: String = format!("{root_path}/.udoc/config.json");
+	let image_path: String = format!("{root_path}/{image_dir_name}");
+	let video_path: String = format!("{root_path}/{video_dir_name}");
 
 	// Creates the directory
-	fs::create_dir(&full_path).expect("TODO: panic message");
-	fs::create_dir(format!("{full_path}/.udoc")).expect("TODO: panic message");
+	fs::create_dir(&root_path).expect("TODO: panic message");
+	fs::create_dir(&data_path).expect("TODO: panic message");
+
 	config::create_config(
 		&config_path,
 		Config::new(
 			1,
 			"log.md".to_string(),
-			format!("{image_dir_name}"),
-			format!("{video_dir_name}"),
+			image_dir_name.to_string(),
+			video_dir_name.to_string(),
 			User {
 				username: String::new(),
 				email: String::new(),
 			},
 		),
 	).expect("TODO: panic message");
-	let config_file = config::read_config(format!("{config_path}/config.json"));
 
-	let images_dir = config_file.images_dir;
-	let videos_dir = config_file.videos_dir;
-
-	fs::create_dir(format!("{full_path}/{images_dir}")).expect("TODO: panic message");
-	fs::create_dir(format!("{full_path}/{videos_dir}")).expect("TODO: panic message");
+	fs::create_dir(&image_path).expect("TODO: panic message");
+	fs::create_dir(&video_path).expect("TODO: panic message");
 
 	// Creates the files
-	log::create_log_file(&full_path, &error_name, description);
+	log::create_log_file(&root_path, &error_name, description)
+		.expect("TODO: panic message");
 
 	Ok(())
 }
