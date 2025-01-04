@@ -1,24 +1,19 @@
-use std::io;
-use std::path::Path;
+use crate::cli::utils::Paths;
 use crate::config;
 use crate::config::Config;
+use std::io;
+use std::path::Path;
 
 pub fn set_config_name(name: &String) -> io::Result<()> {
+    if !Path::new(&Paths::Data.get()).exists() {
+        panic!("This path is not a udoc repository");
+    }
 
-	let binding = std::env::current_dir()?;
-	let root_path = binding.to_str().unwrap();
+    let mut config: Config = config::read_config(&Paths::Config.get());
+    config.user.username = name.to_string();
 
-	let data_path = format!("{root_path}/.udoc");
-	let config_path = format!("{data_path}/config.json");
+    std::fs::remove_file(&Paths::Config.get())?;
+    config::create_config(&Paths::Config.get(), config).expect("TODO: panic message");
 
-	if !Path::new(&data_path).exists() {
-		panic!("This path is not a udoc repository");
-	}
-
-	let mut config: Config = config::read_config(&config_path);
-	config.user.username = name.to_string();
-	std::fs::remove_file(&config_path)?;
-	config::create_config(&data_path, config).expect("TODO: panic message");
-
-	Ok(())
+    Ok(())
 }
