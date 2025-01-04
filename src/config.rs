@@ -86,9 +86,9 @@ mod tests {
         let data_path: String = "/.udoc".to_string();
         let config_path: String = format!("{data_path}/config.json");
         setup(&data_path);
-        
+
         create_config(&config_path, default_config()).unwrap();
-        let config: Config = read_config(&data_path);
+        let config: Config = read_config(&config_path);
 
         assert_eq!(config.version, 0);
         assert_eq!(config.log_file_name, "log.md");
