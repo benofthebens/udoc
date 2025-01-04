@@ -1,11 +1,11 @@
-use std::fs;
-use serde::Serialize;
-use serde::Deserialize;
-use serde_json::{Result, Value};
 pub use crate::config::user::User;
+use serde::Deserialize;
+use serde::Serialize;
+use serde_json::{Result, Value};
+use std::fs;
 mod user;
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct Config {
     pub version: u8,
     pub log_file_name: String,
@@ -21,7 +21,6 @@ impl Config {
         videos_dir: String,
         user: User,
     ) -> Self {
-
         Self {
             version,
             log_file_name,
@@ -33,28 +32,27 @@ impl Config {
 }
 pub fn read_config(config_path: &String) -> Config {
     let config_str: String = fs::read_to_string(config_path).expect("Unable to read file");
-    let config: Config = serde_json::from_str(&config_str).expect("Unable to convert to Config struct");
+    let config: Config =
+        serde_json::from_str(&config_str).expect("Unable to convert to Config struct");
     config
 }
 
 pub fn create_config(config_path: &String, config: Config) -> Result<()> {
-    fs::write(
-        config_path,
-        serde_json::to_string_pretty(&config)?,
-    ).expect("Unable create config at {config_path}");
+    fs::write(config_path, serde_json::to_string_pretty(&config)?)
+        .expect("Unable create config at {config_path}");
 
     Ok(())
 }
 
 #[cfg(test)]
 mod tests {
-    use std::path::Path;
     use super::*;
+    use std::path::Path;
     fn setup(data_path: &String) -> () {
-       fs::create_dir(data_path).unwrap();
+        fs::create_dir(data_path).unwrap();
     }
-    fn teardown(config_path: &String) {
-        fs::remove_dir_all(config_path).unwrap();
+    fn teardown(data_path: &String) {
+        fs::remove_dir_all(data_path).unwrap();
     }
     fn default_config() -> Config {
         Config {
@@ -65,12 +63,16 @@ mod tests {
             user: User {
                 username: "user".to_string(),
                 email: "user@email.com".to_string(),
-            }
+            },
         }
     }
     #[test]
     fn create_config_test() {
-        let env_path = std::env::current_dir().unwrap().to_str().unwrap().to_string();
+        let env_path = std::env::current_dir()
+            .unwrap()
+            .to_str()
+            .unwrap()
+            .to_string();
         let data_path: String = format!("{env_path}/.udoc");
         let config_path: String = format!("{data_path}/config.json");
         setup(&data_path);
@@ -83,14 +85,14 @@ mod tests {
     }
     #[test]
     fn read_config_test() {
-        let data_path: String = "/.udoc".to_string();
+        let data_path: String = "./test".to_string();
         let config_path: String = format!("{data_path}/config.json");
         setup(&data_path);
 
         create_config(&config_path, default_config()).unwrap();
         let config: Config = read_config(&config_path);
 
-        assert_eq!(config.version, 0);
+        assert_eq!(config.version, 1);
         assert_eq!(config.log_file_name, "log.md");
         assert_eq!(config.images_dir, "images");
         assert_eq!(config.videos_dir, "videos");
@@ -109,7 +111,7 @@ mod tests {
             User {
                 username: "user".to_string(),
                 email: "user@email.com".to_string(),
-            }
+            },
         );
 
         assert_eq!(config.version, 1);
@@ -120,4 +122,3 @@ mod tests {
         assert_eq!(config.user.email, "user@email.com")
     }
 }
-
