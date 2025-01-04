@@ -1,10 +1,10 @@
-mod name;
 mod email;
+mod name;
 
-use std::io;
-use crate::cli::commands::config::name::set_config_name;
 use crate::cli::commands::config::email::set_config_email;
+use crate::cli::commands::config::name::set_config_name;
 use clap::Subcommand;
+use std::io;
 
 #[derive(Subcommand, Debug)]
 pub enum ConfigCommands {
