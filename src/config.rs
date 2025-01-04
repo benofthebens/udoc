@@ -56,14 +56,8 @@ mod tests {
     fn teardown(config_path: &String) {
         fs::remove_dir_all(config_path).unwrap();
     }
-    #[test]
-    fn create_config_test() {
-        let env_path = std::env::current_dir().unwrap().to_str().unwrap().to_string();
-        let data_path: String = format!("{env_path}/.udoc");
-        let config_path: String = format!("{data_path}/config.json");
-        setup(&data_path);
-
-        let config: Config = Config {
+    fn default_config() -> Config {
+        Config {
             version: 1,
             log_file_name: "log.md".to_string(),
             images_dir: "images".to_string(),
@@ -72,8 +66,16 @@ mod tests {
                 username: "user".to_string(),
                 email: "user@email.com".to_string(),
             }
-        };
-        create_config(&config_path, config).unwrap();
+        }
+    }
+    #[test]
+    fn create_config_test() {
+        let env_path = std::env::current_dir().unwrap().to_str().unwrap().to_string();
+        let data_path: String = format!("{env_path}/.udoc");
+        let config_path: String = format!("{data_path}/config.json");
+        setup(&data_path);
+
+        create_config(&config_path, default_config()).unwrap();
 
         assert!(Path::new(&config_path).exists());
 
@@ -85,7 +87,23 @@ mod tests {
     }
     #[test]
     fn new_config_test() {
-;
+        let config: Config = Config::new(
+            1,
+            "log.md".to_string(),
+            "images".to_string(),
+            "videos".to_string(),
+            User {
+                username: "user".to_string(),
+                email: "user@email.com".to_string(),
+            }
+        );
+
+        assert_eq!(config.version, 1);
+        assert_eq!(config.log_file_name, "log.md");
+        assert_eq!(config.images_dir, "images");
+        assert_eq!(config.videos_dir, "videos");
+        assert_eq!(config.user.username, "user");
+        assert_eq!(config.user.email, "user@email.com")
     }
 }
 
