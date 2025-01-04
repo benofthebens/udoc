@@ -41,57 +41,51 @@ pub fn create_config(config_path: &String, config: Config) -> Result<()> {
     fs::write(
         config_path,
         serde_json::to_string_pretty(&config)?,
-    ).expect("Unable create config");
+    ).expect("Unable create config at {config_path}");
 
     Ok(())
 }
 
-/*#[cfg(test)]
+#[cfg(test)]
 mod tests {
-
+    use std::path::Path;
     use super::*;
-    fn init() -> () {
-        let root_path = "./test";
-        if Path::new(&root_path).exists() {
-            return ();
-        }
-        std::fs::create_dir("./test");
-        std::fs::create_dir("./test/.udoc");
-
-        return ();
+    fn setup(data_path: &String) -> () {
+       fs::create_dir(data_path).unwrap();
     }
-    fn remove_files() -> (){
-        std::fs::remove_dir_all("./test");
-        ();
+    fn teardown(config_path: &String) {
+        fs::remove_dir_all(config_path).unwrap();
+    }
+    #[test]
+    fn create_config_test() {
+        let env_path = std::env::current_dir().unwrap().to_str().unwrap().to_string();
+        let data_path: String = format!("{env_path}/.udoc");
+        let config_path: String = format!("{data_path}/config.json");
+        setup(&data_path);
+
+        let config: Config = Config {
+            version: 1,
+            log_file_name: "log.md".to_string(),
+            images_dir: "images".to_string(),
+            videos_dir: "videos".to_string(),
+            user: User {
+                username: "user".to_string(),
+                email: "user@email.com".to_string(),
+            }
+        };
+        create_config(&config_path, config).unwrap();
+
+        assert!(Path::new(&config_path).exists());
+
+        teardown(&data_path);
+    }
+    #[test]
+    fn read_config_test() {
 
     }
     #[test]
-    fn read_config_test() -> Result<()> {
-        init();
-        create_config(&"./test".to_string());
-
-        let config: Config = read_config(
-            "./test/.udoc/config.json".to_string()
-        );
-
-        assert_eq!(config.version, 1);
-        assert_eq!(config.log_file_name, "log.md".to_string());
-        assert_eq!(config.images_dir, "images".to_string());
-        assert_eq!(config.videos_dir, "videos".to_string());
-
-        remove_files();
-        Ok(())
-    }
-
-    #[test]
-    fn create_config_test() -> Result<()> {
-        init();
-
-        create_config(&"./test/.udoc".to_string());
-
-        assert!(Path::new("./test/.udoc/config.json").exists());
-
-        Ok(())
+    fn new_config_test() {
+;
     }
 }
-*/
+
