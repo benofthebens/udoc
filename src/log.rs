@@ -1,5 +1,5 @@
 use crate::config;
-use crate::config::Config;
+use config::Config;
 use std::fs;
 use std::fs::File;
 use std::fs::OpenOptions;
@@ -7,8 +7,8 @@ use std::io;
 use std::io::Write;
 use std::path::Path;
 
-pub fn get_images(path: String) -> Vec<String> {
-    let images = fs::read_dir(path).expect("Unable to read directory");
+pub fn get_images(image_path: String) -> Vec<String> {
+    let images = fs::read_dir(image_path).expect("Unable to read directory");
     let mut image_list = vec![];
 
     for image in images {
@@ -25,7 +25,8 @@ pub fn create_log_file(
     path: &String,
     name: &String,
     description: &String,
-) -> Result<(), std::io::Error> {
+) -> Result<(), io::Error> {
+
     let mut file = OpenOptions::new()
         .append(true)
         .create(true)
@@ -37,18 +38,21 @@ pub fn create_log_file(
     writeln!(file, "{description}");
     writeln!(file, "---");
     writeln!(file, "### Examples");
+
     update_images(&mut file, path);
     Ok(())
 }
-pub fn update_images(file: &mut File, path: &String) -> Result<(), std::io::Error> {
-    let config: Config = config::read_config(format!("{path}/.udoc/config.json"));
+pub fn update_images(file: &mut File, root_path: &String) -> Result<(), io::Error> {
+
+    let config_path: String = format!("{root_path}/.udoc/config.json");
+    let config: Config = config::read_config(&config_path);
     let image_dir = config.images_dir;
 
-    let images: Vec<String> = get_images(format!("{path}/{image_dir}"));
-    for image in images {
-        let image_upd = image.replace("\\", "/");
+    let images: Vec<String> = get_images(format!("{root_path}/{image_dir}"));
 
-        writeln!(file, "![Sample Image][{image_upd}]")?;
+    for image in images {
+        let image_file_path = image.replace("\\", "/");
+        writeln!(file, "![Sample Image][{image_file_path}]")?;
     }
 
     Ok(())
