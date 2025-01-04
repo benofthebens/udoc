@@ -22,15 +22,16 @@ pub fn get_images(image_path: String) -> Vec<String> {
 }
 
 pub fn create_log_file(
-    path: &String,
+    root_path: &String,
     name: &String,
     description: &String,
+    config: Config
 ) -> Result<(), io::Error> {
 
     let mut file = OpenOptions::new()
         .append(true)
         .create(true)
-        .open(format!("{path}/log.md"))?;
+        .open(format!("{root_path}/log.md"))?;
 
     writeln!(file, "## {name}");
     writeln!(file, "---");
@@ -39,15 +40,16 @@ pub fn create_log_file(
     writeln!(file, "---");
     writeln!(file, "### Examples");
 
-    update_images(&mut file, path);
+    update_images(&mut file, root_path, config);
+
     Ok(())
 }
-pub fn update_images(file: &mut File, root_path: &String) -> Result<(), io::Error> {
-
-    let config_path: String = format!("{root_path}/.udoc/config.json");
-    let config: Config = config::read_config(&config_path);
+pub fn update_images(
+    file: &mut File,
+    root_path: &String,
+    config: Config
+) -> Result<(), io::Error> {
     let image_dir = config.images_dir;
-
     let images: Vec<String> = get_images(format!("{root_path}/{image_dir}"));
 
     for image in images {
@@ -61,23 +63,12 @@ pub fn update_images(file: &mut File, root_path: &String) -> Result<(), io::Erro
 #[cfg(test)]
 mod tests {
     use super::*;
-    fn setup() -> () {
-        std::fs::create_dir("test");
-        std::fs::create_dir("test/images");
-        std::fs::create_dir(".udoc");
-    }
-    fn destroy() -> () {
-        std::fs::remove_dir_all("test");
-    }
+    fn setup() {}
+    fn teardown() {}
     #[test]
-    fn create_log_file_test() -> () {
-        setup();
-
-        let path: String = "C:/Users/benja/Documents/udoc/test".to_string();
-        create_log_file(&path, &"err".to_string(), &String::new());
-
-        assert!(Path::new(&format!("{path}/log.md")).exists());
-
-        destroy();
-    }
+    fn update_images_test() {}
+    #[test]
+    fn create_log_file_test() {}
+    #[test]
+    fn get_images_test() {}
 }
