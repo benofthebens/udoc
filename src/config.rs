@@ -1,14 +1,9 @@
-use std::fmt;
 use std::fs;
-use std::io;
-use std::path::Path;
-
 use serde::Serialize;
-
 use serde::Deserialize;
 use serde_json::{Result, Value};
-mod user;
 pub use crate::config::user::User;
+mod user;
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct Config {
@@ -26,6 +21,7 @@ impl Config {
         videos_dir: String,
         user: User,
     ) -> Self {
+
         Self {
             version,
             log_file_name,
