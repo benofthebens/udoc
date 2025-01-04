@@ -1,11 +1,11 @@
-mod cmd;
+mod cli;
 mod config;
 mod log;
 
-use crate::cmd::Cmd;
+use crate::cli::Cli;
 use clap::Parser;
 
 fn main() {
-    let cmd = Cmd::parse();
+    let cmd = Cli::parse();
     cmd.get_command().execute();
 }
