@@ -1,24 +1,19 @@
-use std::io;
-use std::path::Path;
+use crate::cli::utils::Paths;
 use crate::config;
 use crate::config::Config;
+use std::io;
+use std::path::Path;
 
 pub fn set_config_email(email: &String) -> io::Result<()> {
-	let binding = std::env::current_dir()?;
-	let root_path = binding.to_str().unwrap();
+    if !Path::new(&Paths::Data.get()).exists() {
+        panic!("This path is not a udoc repository");
+    }
 
-	let data_path = format!("{root_path}/.udoc");
-	let config_path = format!("{data_path}/config.json");
+    let mut config_json: Config = config::read_config(&Paths::Config.get());
 
-	if !Path::new(&data_path).exists() {
-		panic!("This path is not a udoc repository");
-	}
+    config_json.user.email = email.to_string();
 
-	let mut config_json: Config = config::read_config(&config_path);
+    config::create_config(&Paths::Config.get(), config_json).expect("TODO: panic message");
 
-	config_json.user.email = email.to_string();
-
-	config::create_config(&config_path, config_json).expect("TODO: panic message");
-
-	Ok(())
+    Ok(())
 }
