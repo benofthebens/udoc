@@ -1,10 +1,10 @@
 //! This module is for the implementation for the update command
 
+use crate::cli::utils::Paths;
+use crate::{config, log};
 use std::fs::OpenOptions;
 use std::io;
 use std::path::Path;
-use crate::{config, log};
-
 
 /// >This function assumes that you are already inside an udoc repository checks who you are
 /// checks if there are any new images in the image directory and updates the log.md accordingly.
@@ -23,28 +23,28 @@ use crate::{config, log};
 /// - Panics if the current directory is _not_ a repo
 /// - Panics if no _email or name_ is given in the config file
 pub fn update() -> io::Result<()> {
+    let repo_config = config::read_config(&Paths::Config.get());
 
-	let binding = std::env::current_dir()?;
-	let root_path: &str = binding.to_str().unwrap();
-	let data_path = format!("{root_path}/.udoc");
-	let config_path = format!("{data_path}/config.json");
-	let log_path = format!("{root_path}/log.md");
+    if !Path::new(&Paths::Data.get()).exists() {
+        panic!("This path is not a udoc repository");
+    } else if repo_config.user.email == String::new() || repo_config.user.username == String::new()
+    {
+        panic!("Please choose give your name and email");
+    }
 
-	let repo_config = config::read_config(&config_path);
+    let mut file = OpenOptions::new()
+        .append(true)
+        .create(true)
+        .open(Paths::Log.get())?;
 
-	if !Path::new(&data_path).exists() {
-		panic!("This path is not a udoc repository");
-	} else if repo_config.user.email == String::new() || repo_config.user.username == String::new() {
-		panic!("Please choose give your name and email");
-	}
+    log::update_images(
+        &mut file,
+        &Paths::Root.get(),
+        repo_config
+    ).expect("TODO: panic message");
 
-	let mut file = OpenOptions::new()
-		.append(true)
-		.create(true)
-		.open(log_path)?;
-
-	log::update_images(&mut file, &root_path.to_string())
-		.expect("TODO: panic message");
-
-	Ok(())
+    Ok(())
 }
+
+#[cfg(test)]
+mod tests {}
