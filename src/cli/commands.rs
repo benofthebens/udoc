@@ -5,8 +5,8 @@ mod reset;
 mod update;
 use crate::cli::commands::config::ConfigCommands;
 use crate::cli::commands::new::new;
-use crate::cli::commands::update::update;
 use crate::cli::commands::reset::reset;
+use crate::cli::commands::update::update;
 use chrono::prelude::*;
 use clap::Subcommand;
 use std::io;
@@ -77,5 +77,5 @@ impl Commands {
             Commands::Config { cmd } => cmd.execute(),
             Commands::Reset => reset(),
         }
-    } 
+    }
 }
