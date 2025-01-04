@@ -1,9 +1,10 @@
+//! This module is for the implementation for the update command
+
 use std::fs::OpenOptions;
 use std::io;
 use std::path::Path;
 use crate::{config, log};
 
-//! This module is for the implementation for the update command
 
 /// >This function assumes that you are already inside an udoc repository checks who you are
 /// checks if there are any new images in the image directory and updates the log.md accordingly.

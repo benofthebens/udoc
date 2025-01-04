@@ -1,8 +1,8 @@
+//! This module is the implementation for the reset command
 use std::{fs, io};
 use std::path::Path;
 use crate::config;
 use crate::config::{Config, User};
-//! This module is the implementation for the reset command
 /// > This function removes the directory and all it's contents
 /// recreates the directory and config
 ///

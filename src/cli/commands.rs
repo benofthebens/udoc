@@ -1,8 +1,8 @@
+//! This module is to map the subcommands enums to their corresponding functions
 mod config;
 mod new;
 mod reset;
 mod update;
-
 use crate::cli::commands::config::ConfigCommands;
 use crate::cli::commands::new::new;
 use crate::cli::commands::update::update;
@@ -10,7 +10,6 @@ use crate::cli::commands::reset::reset;
 use chrono::prelude::*;
 use clap::Subcommand;
 use std::io;
-//! This module is to map the subcommands enums to their corresponding functions
 
 /// > Represents the different subcommand variants with their corresponding arguments
 ///

@@ -1,8 +1,8 @@
+//! This module initialises an udoc repository creating the directories and files
 use std::{fs, io};
 use chrono::Local;
 use crate::{config, log};
 use crate::config::{Config, User};
-//! This module initialises an udoc repository creating the directories and files
 /// This takes in the arguments from the cli finds the current directory
 /// creates a name which includes the __name__ parameter and the current date
 /// initialises all paths for a common udoc repo.
