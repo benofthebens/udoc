@@ -4,7 +4,7 @@ mod log;
 
 use crate::cli::Cli;
 use clap::Parser;
-use crate::log::{create_exchange_file, read_log_file};
+use crate::log::{read_log_file};
 
 fn main() {
     // let cmd = Cli::parse();
@@ -14,5 +14,5 @@ fn main() {
         Ok(contents) => contents,
         _ => panic!("AHHH")
     };
-    create_exchange_file(contents);
+    println!("{:?}", contents);
 }
