@@ -1,3 +1,5 @@
+mod html;
+
 use std::{fs, io};
 use quick_xml::se::Serializer;
 use serde::Serialize;
@@ -6,7 +8,7 @@ use crate::log::Section;
 #[derive(Debug, Default, Serialize)]
 pub struct Exchange {
     pub title: String,
-    pub sections: Vec<Section>,
+    pub section: Vec<Section>,
 }
 impl Exchange {
     pub fn set_title(&mut self, title: &String) {
@@ -32,14 +34,14 @@ impl ExchangeItem {
            }
     }
 }
-pub fn create_exchange_file(contents: Exchange) -> Result<String, io::Error> {
+pub fn create_exchange_file(exchange_path: &String, contents: Exchange) -> Result<String, io::Error> {
     let mut buffer = String::new();
-    fs::create_dir_all("./.udoc/exchange")?;
+    fs::create_dir_all(exchange_path)?;
     let mut ser = Serializer::with_root(&mut buffer, Some("error"))
         .unwrap();
     ser.indent(' ', 4);
     contents.serialize(ser).unwrap();
-    fs::write("./.udoc/exchange/exchange.xml", &buffer)?;
+    fs::write(format!("{exchange_path}/exchange.xml"), &buffer)?;
 
     Ok(buffer)
 }

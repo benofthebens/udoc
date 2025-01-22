@@ -5,7 +5,7 @@ use crate::{config, log};
 use std::fs::OpenOptions;
 use std::io;
 use std::path::Path;
-
+use crate::log::exchange::Exchange;
 /// >This function assumes that you are already inside an udoc repository checks who you are
 /// checks if there are any new images in the image directory and updates the log.md accordingly.
 /// ## Todo
@@ -27,8 +27,8 @@ pub fn update() -> io::Result<()> {
 
     if !Path::new(&Paths::Data.get()).exists() {
         panic!("This path is not a udoc repository");
-    } else if repo_config.user.email == String::new() || repo_config.user.username == String::new()
-    {
+    } 
+    else if repo_config.user.email == String::new() || repo_config.user.username == String::new() {
         panic!("Please choose give your name and email");
     }
 
@@ -36,13 +36,16 @@ pub fn update() -> io::Result<()> {
         .append(true)
         .create(true)
         .open(Paths::Log.get())?;
-
+    
     log::update_images(
         &mut file,
         &Paths::Root.get(),
         repo_config
     ).expect("TODO: panic message");
 
+    let exchange: Exchange = log::read_log_file(&Paths::Log.get())?;
+    std::fs::remove_file(format!("{}/exchange.xml",Paths::Exchange.get()));
+    log::exchange::create_exchange_file(&Paths::Exchange.get() ,exchange);
     Ok(())
 }
 

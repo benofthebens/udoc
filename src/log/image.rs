@@ -35,6 +35,7 @@ pub fn get_images(image_path: String) -> Vec<String> {
     let images = fs::read_dir(image_path).expect("Unable to read directory");
     let mut image_list = vec![];
 
+
     for image in images {
         let entry = image.expect("Unable to get image").path();
         if entry.extension().map(|s| s != "png").unwrap() {

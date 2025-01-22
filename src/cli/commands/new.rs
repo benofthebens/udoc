@@ -1,6 +1,9 @@
 //! This module initialises an udoc repository creating the directories and files
 use crate::config::{Config, User};
+use crate::log::read_log_file;
+use crate::log::exchange::{create_exchange_file, Exchange};
 use crate::{config, log};
+
 use chrono::Local;
 use std::{fs, io};
 /// This takes in the arguments from the cli finds the current directory
@@ -63,6 +66,8 @@ pub fn new(
 
     // Creates the files
     log::create_log_file(&root_path, &error_name, description, config).expect("TODO: panic message");
+    let exchange: Exchange = log::read_log_file(&format!("{root_path}/log.md"))?;
+    log::exchange::create_exchange_file(&format!("{root_path}/.udoc/exchange/"), exchange);
     Ok(())
 }
 #[cfg(test)]

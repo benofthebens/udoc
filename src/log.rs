@@ -1,4 +1,4 @@
-mod exchange;
+pub mod exchange;
 mod image;
 mod section;
 mod utils;
@@ -52,21 +52,26 @@ pub fn read_log_file(log_path: &String) -> Result<Exchange, io::Error> {
     for line in reader.lines() {
         let line: String = line?;
         let pattern_vec: Vec<&str> = line.split(' ').collect();
-        let mut pattern = *pattern_vec.get(0).unwrap();
-        if line.chars().nth(0).unwrap() == '!' {
-            pattern = "![";
+        let mut pattern = match pattern_vec.get(0) {
+            Some(pattern) => pattern,
+            None => ""
+        };
+        if let Some(first_char) = line.chars().nth(0) {
+            if first_char == '!' {
+                pattern = "![";
+            }
         }
-
         let exchange_type: ExchangeItem = ExchangeItem::map_markdown(pattern)
             .unwrap_or_else(|error| { panic!("") });
 
-        if line.contains("### ") && !current_section.text.is_empty() {
-            exchange_file.sections.push(current_section.clone());
+        if line.contains("### ") && !current_section.heading.is_empty() {
+            exchange_file.section.push(current_section.clone());
             current_section = Default::default();
         }
-        else if line.is_empty() || line.contains("---") {
+        else if line.contains("---") {
             continue;
         }
+        
         match exchange_type {
             ExchangeItem::Title => exchange_file.set_title(&line),
             ExchangeItem::Heading => current_section.handle_heading(&line),
@@ -74,9 +79,10 @@ pub fn read_log_file(log_path: &String) -> Result<Exchange, io::Error> {
             ExchangeItem::Image => current_section.set_images(&line),
         }
 
+        println!("{:?}", current_section); 
+
     }
-    // Don't forget to add the last section
-    exchange_file.sections.push(current_section.clone());
+    exchange_file.section.push(current_section.clone());
 
     Ok(exchange_file)
 }

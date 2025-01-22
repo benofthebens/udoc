@@ -1,10 +1,9 @@
-use crate::config::Config;
-
 pub enum Paths {
     Root,
     Data,
     Config,
     Log,
+    Exchange
 }
 impl Paths {
     pub fn get(&self) -> String {
@@ -19,6 +18,7 @@ impl Paths {
             Paths::Data => format!("{root_path}/.udoc"),
             Paths::Config => format!("{root_path}/.udoc/config.json"),
             Paths::Log => format!("{root_path}/log.md"),
+            Paths::Exchange => format!("{root_path}/.udoc/exchange/"),
         }
     }
 }
