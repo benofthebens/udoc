@@ -3,6 +3,8 @@ mod config;
 mod new;
 mod reset;
 mod update;
+mod export;
+
 use crate::cli::commands::config::ConfigCommands;
 use crate::cli::commands::new::new;
 use crate::cli::commands::reset::reset;
@@ -10,6 +12,7 @@ use crate::cli::commands::update::update;
 use chrono::prelude::*;
 use clap::Subcommand;
 use std::io;
+use crate::cli::commands::export::export;
 
 /// > Represents the different subcommand variants with their corresponding arguments
 ///
@@ -48,6 +51,7 @@ pub enum Commands {
         cmd: ConfigCommands,
     },
     Reset,
+    Export,
 }
 impl Commands {
     /// Maps the command to corresponding function
@@ -76,6 +80,7 @@ impl Commands {
             Commands::Update => update(),
             Commands::Config { cmd } => cmd.execute(),
             Commands::Reset => reset(),
+            Commands::Export => export(),
         }
     }
 }
