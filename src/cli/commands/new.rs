@@ -65,9 +65,25 @@ pub fn new(
     .expect("TODO: panic message");
 
     // Creates the files
-    log::create_log_file(&root_path, &error_name, description, config).expect("TODO: panic message");
-    let exchange: Exchange = log::read_log_file(&format!("{root_path}/log.md"))?;
-    log::exchange::create_exchange_file(&format!("{root_path}/.udoc/exchange/"), exchange);
+    let exchange = Exchange {
+        title: error_name,
+        section: vec![
+            Section {
+                heading: String::from("Description"),
+                text: description.to_string(), 
+                images: None
+            }
+        ]
+    };
+
+    let xml: String = create_exchange_file(
+        &format!("{root_path}/.udoc/exchange/"),
+        &exchange
+    )?;
+
+    println!("{}", xml);
+
+    log::write_log_file(&exchange, &root_path)?;
     Ok(())
 }
 #[cfg(test)]
