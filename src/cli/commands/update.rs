@@ -1,11 +1,12 @@
 //! This module is for the implementation for the update command
 
+use std::cmp::Ordering;
 use crate::cli::utils::Paths;
 use crate::{config, log};
 use std::fs::OpenOptions;
 use std::io;
 use std::path::Path;
-
+use crate::log::exchange::Exchange;
 /// >This function assumes that you are already inside an udoc repository checks who you are
 /// checks if there are any new images in the image directory and updates the log.md accordingly.
 /// ## Todo
@@ -27,23 +28,35 @@ pub fn update() -> io::Result<()> {
 
     if !Path::new(&Paths::Data.get()).exists() {
         panic!("This path is not a udoc repository");
-    } else if repo_config.user.email == String::new() || repo_config.user.username == String::new()
-    {
+    } 
+    else if repo_config.user.email == String::new() || repo_config.user.username == String::new() {
         panic!("Please choose give your name and email");
     }
 
-    let mut file = OpenOptions::new()
-        .append(true)
-        .create(true)
-        .open(Paths::Log.get())?;
+    let log_file_metadata= std::fs::metadata(&Paths::Log.get())?;
+    let exchange_file_metadata= std::fs::metadata(&Paths::Exchange.get())?;
 
-    log::update_images(
-        &mut file,
-        &Paths::Root.get(),
-        repo_config
-    ).expect("TODO: panic message");
+    let log_file_last_edited = log_file_metadata.modified()?;
+    let exchange_file_last_edited = exchange_file_metadata.modified()?;
 
+    match log_file_last_edited.cmp(&exchange_file_last_edited) {
+        Ordering::Equal | Ordering::Less => update_log_file(),
+        Ordering::Greater => update_exchange_file()
+    }?;
     Ok(())
+}
+fn update_exchange_file() -> io::Result<()> {
+    let exchange: Exchange = log::read_log_file(&Paths::Log.get())?;
+    std::fs::remove_file(format!("{}/exchange.xml", Paths::Exchange.get()));
+    log::exchange::create_exchange_file(&Paths::Exchange.get() ,&exchange)?;
+    println!("Updated exchange file");
+    Ok(())
+}
+fn update_log_file() -> io::Result<()> {
+    let exchange: Exchange = log::exchange::read_exchange_file(&Paths::Exchange.get())?;
+    std::fs::remove_file(Paths::Log.get())?;
+    println!("Updated log file");
+    log::write_log_file(&exchange, &Paths::Root.get())
 }
 
 #[cfg(test)]

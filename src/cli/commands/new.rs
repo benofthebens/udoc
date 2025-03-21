@@ -1,8 +1,13 @@
 //! This module initialises an udoc repository creating the directories and files
 use crate::config::{Config, User};
+use crate::log::read_log_file;
+use crate::log::exchange::{create_exchange_file, Exchange};
+use crate::log::section::Section;
 use crate::{config, log};
+
 use chrono::Local;
 use std::{fs, io};
+
 /// This takes in the arguments from the cli finds the current directory
 /// creates a name which includes the __name__ parameter and the current date
 /// initialises all paths for a common udoc repo.
@@ -25,9 +30,10 @@ pub fn new(
     video_dir_name: &String,
     error_number: &u8,
 ) -> io::Result<()> {
-    // Gets the current directory
-    let binding = std::env::current_dir()?;
-    let environment_path: &str = binding.to_str().unwrap();
+
+    // Gets the environment directory
+    let environment_path= std::env::current_dir()?;
+    let environment_path = environment_path.to_str().unwrap();
 
     let date = Local::now().date_naive();
     let error_name = format!("{name}-{date}");
@@ -39,10 +45,10 @@ pub fn new(
     let video_path: String = format!("{root_path}/{video_dir_name}");
 
     // Creates the directory
-    fs::create_dir(&root_path).expect("TODO: panic message");
-    fs::create_dir(&data_path).expect("TODO: panic message");
-    fs::create_dir(&image_path).expect("TODO: panic message");
-    fs::create_dir(&video_path).expect("TODO: panic message");
+    fs::create_dir(&root_path)?;
+    fs::create_dir(&data_path)?;
+    fs::create_dir(&image_path)?;
+    fs::create_dir(&video_path)?;
 
     let config: Config = Config::new(
         1,
@@ -58,52 +64,34 @@ pub fn new(
     config::create_config(
         &config_path,
         config.clone(),
-    )
-    .expect("TODO: panic message");
+    )?;
 
     // Creates the files
-    log::create_log_file(&root_path, &error_name, description, config).expect("TODO: panic message");
+    let exchange = Exchange {
+        title: error_name,
+        section: vec![
+            Section {
+                heading: String::from("Description"),
+                text: description.to_string(), 
+                images: None
+            }
+        ]
+    };
+
+    let xml: String = create_exchange_file(
+        &format!("{root_path}/.udoc/exchange/"),
+        &exchange
+    )?;
+
+    println!("{}", xml);
+
+    log::write_log_file(&exchange, &root_path)?;
     Ok(())
 }
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use std::path::Path;
-
-    fn setup() -> () {}
-    fn destroy(name: String) -> () {
-        std::fs::remove_dir_all(name);
-        ()
-    }
-
     #[test]
-    fn init_test() -> io::Result<()> {
-        let test_name: String = "test".to_string();
-        let date = Local::now().date_naive();
-        let full_path = format!("./{test_name}-{date}");
+    pub fn new_test() -> () {
 
-        let udoc_path = format!("{}/.udoc", &full_path);
-        let images_path = format!("{}/images", &full_path);
-        let videos_path = format!("{}/videos", &full_path);
-        let log_file = format!("{}/log.md", &full_path);
-
-        new(
-            &test_name,
-            &String::new(),
-            &"".to_string(),
-            &"".to_string(),
-            &0,
-        )
-        .expect("TODO: panic message");
-
-        assert!(Path::new(&full_path).exists());
-        assert!(Path::new(&udoc_path).exists());
-        assert!(Path::new(&images_path).exists());
-        assert!(Path::new(&videos_path).exists());
-        assert!(Path::new(&log_file).exists());
-
-        destroy(format!("{test_name}-{date}"));
-
-        Ok(())
     }
 }

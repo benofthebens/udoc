@@ -13,7 +13,7 @@ pub fn set_config_email(email: &String) -> io::Result<()> {
 
     config_json.user.email = email.to_string();
 
-    config::create_config(&Paths::Config.get(), config_json).expect("TODO: panic message");
+    config::create_config(&Paths::Config.get(), config_json)?;
 
     Ok(())
 }

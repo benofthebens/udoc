@@ -13,7 +13,7 @@ pub fn set_config_name(name: &String) -> io::Result<()> {
     config.user.username = name.to_string();
 
     std::fs::remove_file(&Paths::Config.get())?;
-    config::create_config(&Paths::Config.get(), config).expect("TODO: panic message");
+    config::create_config(&Paths::Config.get(), config)?;
 
     Ok(())
 }
