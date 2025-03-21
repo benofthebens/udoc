@@ -14,8 +14,8 @@ pub fn reset() -> io::Result<()> {
         panic!("This is not a udoc repository ");
     }
 
-    fs::remove_dir_all(&Paths::Data.get()).expect("TODO: panic message");
-    fs::create_dir(&Paths::Data.get()).expect("Unable to create directory");
+    fs::remove_dir_all(&Paths::Data.get())?;
+    fs::create_dir(&Paths::Data.get())?;
 
     config::create_config(
         &Paths::Config.get(),
@@ -29,8 +29,7 @@ pub fn reset() -> io::Result<()> {
                 email: String::new(),
             },
         ),
-    )
-    .expect("TODO: panic message");
+    )?;
 
     Ok(())
 }
