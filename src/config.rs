@@ -31,16 +31,14 @@ impl Config {
     }
 }
 pub fn read_config(config_path: &String) -> Config {
-    let config_str: String = fs::read_to_string(config_path).expect("Unable to read file");
+    let config_str: String = fs::read_to_string(config_path).unwrap();
     let config: Config =
-        serde_json::from_str(&config_str).expect("Unable to convert to Config struct");
+        serde_json::from_str(&config_str).unwrap();
     config
 }
 
 pub fn create_config(config_path: &String, config: Config) -> Result<()> {
-    fs::write(config_path, serde_json::to_string_pretty(&config)?)
-        .expect("Unable create config at {config_path}");
-
+    fs::write(config_path, serde_json::to_string_pretty(&config)?).unwrap();
     Ok(())
 }
 
