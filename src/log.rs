@@ -1,6 +1,6 @@
 pub mod exchange;
 mod image;
-mod section;
+pub(crate) mod section;
 mod utils;
 
 use std::cmp::PartialEq;
@@ -15,14 +15,12 @@ use std::path::Path;
 use quick_xml::se::Serializer;
 use serde::Serialize;
 use crate::log::exchange::{Exchange, ExchangeItem};
-pub use crate::log::image::{update_images, Image, Images};
+pub use crate::log::image::{Image, Images};
 use crate::log::section::Section;
 
-pub fn create_log_file(
-    root_path: &String,
-    name: &String,
-    description: &String,
-    config: Config
+pub fn write_log_file(
+    exchange: &Exchange,
+    root_path: &String
 ) -> Result<(), io::Error> {
 
     let mut file = OpenOptions::new()
@@ -30,14 +28,23 @@ pub fn create_log_file(
         .create(true)
         .open(format!("{root_path}/log.md"))?;
 
-    writeln!(file, "## {name}")?;
-    writeln!(file, "---")?;
-    writeln!(file, "### Description")?;
-    writeln!(file, "{description}")?;
-    writeln!(file, "---")?;
-    writeln!(file, "### Examples")?;
+    writeln!(file, "## {}", exchange.title)?;
 
-    update_images(&mut file, root_path, config);
+    for section in &exchange.section {
+        let section_heading: &String = &section.heading;
+        let section_text: &String = &section.text;
+
+        writeln!(file, "### {}", section_heading)?;
+        writeln!(file, "{}", section_text)?;
+
+        if let Some(images) = &section.images {
+            for image in &images.image_list {
+                let image_src = &image.src;
+                let image_alt = &image.alt;
+                writeln!(file, "![{}]({})", image_alt, image_src)?;
+            }
+        }
+    }
 
     Ok(())
 }
@@ -52,15 +59,18 @@ pub fn read_log_file(log_path: &String) -> Result<Exchange, io::Error> {
     for line in reader.lines() {
         let line: String = line?;
         let pattern_vec: Vec<&str> = line.split(' ').collect();
+
         let mut pattern = match pattern_vec.get(0) {
             Some(pattern) => pattern,
             None => ""
         };
+
         if let Some(first_char) = line.chars().nth(0) {
             if first_char == '!' {
                 pattern = "![";
             }
         }
+
         let exchange_type: ExchangeItem = ExchangeItem::map_markdown(pattern)
             .unwrap_or_else(|error| { panic!("") });
 
@@ -68,10 +78,11 @@ pub fn read_log_file(log_path: &String) -> Result<Exchange, io::Error> {
             exchange_file.section.push(current_section.clone());
             current_section = Default::default();
         }
+
         else if line.contains("---") {
             continue;
         }
-        
+
         match exchange_type {
             ExchangeItem::Title => exchange_file.set_title(&line),
             ExchangeItem::Heading => current_section.handle_heading(&line),
@@ -80,7 +91,6 @@ pub fn read_log_file(log_path: &String) -> Result<Exchange, io::Error> {
         }
 
         println!("{:?}", current_section); 
-
     }
     exchange_file.section.push(current_section.clone());
 
