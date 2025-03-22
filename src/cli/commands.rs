@@ -9,10 +9,10 @@ use crate::cli::commands::config::ConfigCommands;
 use crate::cli::commands::new::new;
 use crate::cli::commands::reset::reset;
 use crate::cli::commands::update::update;
+use crate::cli::commands::export::export;
 use chrono::prelude::*;
 use clap::Subcommand;
 use std::io;
-use crate::cli::commands::export::export;
 
 /// > Represents the different subcommand variants with their corresponding arguments
 ///
@@ -26,6 +26,7 @@ use crate::cli::commands::export::export;
 /// - udoc update
 /// - udoc config <config-subcommand>
 /// - udoc reset
+/// - udoc export
 /// ```
 #[derive(Subcommand, Debug)]
 pub enum Commands {
@@ -60,7 +61,8 @@ impl Commands {
     /// ```
     /// // Cmd: `udoc new -n err`
     /// // Maps to: `New` enum variant
-    /// // executes: `new("err", "", "", 1)`
+    /// // executes:
+    /// new("err", "", "", 1)
     /// ```
     pub fn execute(&self) -> io::Result<()> {
         match self {
