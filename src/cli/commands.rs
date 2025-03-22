@@ -3,10 +3,13 @@ mod config;
 mod new;
 mod reset;
 mod update;
+mod export;
+
 use crate::cli::commands::config::ConfigCommands;
 use crate::cli::commands::new::new;
 use crate::cli::commands::reset::reset;
 use crate::cli::commands::update::update;
+use crate::cli::commands::export::export;
 use chrono::prelude::*;
 use clap::Subcommand;
 use std::io;
@@ -23,6 +26,7 @@ use std::io;
 /// - udoc update
 /// - udoc config <config-subcommand>
 /// - udoc reset
+/// - udoc export
 /// ```
 #[derive(Subcommand, Debug)]
 pub enum Commands {
@@ -48,6 +52,7 @@ pub enum Commands {
         cmd: ConfigCommands,
     },
     Reset,
+    Export,
 }
 impl Commands {
     /// Maps the command to corresponding function
@@ -56,7 +61,8 @@ impl Commands {
     /// ```
     /// // Cmd: `udoc new -n err`
     /// // Maps to: `New` enum variant
-    /// // executes: `new("err", "", "", 1)`
+    /// // executes:
+    /// new("err", "", "", 1)
     /// ```
     pub fn execute(&self) -> io::Result<()> {
         match self {
@@ -76,6 +82,7 @@ impl Commands {
             Commands::Update => update(),
             Commands::Config { cmd } => cmd.execute(),
             Commands::Reset => reset(),
+            Commands::Export => export(),
         }
     }
 }

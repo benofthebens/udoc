@@ -47,7 +47,7 @@ pub fn update() -> io::Result<()> {
 }
 fn update_exchange_file() -> io::Result<()> {
     let exchange: Exchange = log::read_log_file(&Paths::Log.get())?;
-    std::fs::remove_file(format!("{}/exchange.xml", Paths::Exchange.get()));
+    std::fs::remove_file(format!("{}/exchange.xml", Paths::Exchange.get()))?;
     log::exchange::create_exchange_file(&Paths::Exchange.get() ,&exchange)?;
     println!("Updated exchange file");
     Ok(())

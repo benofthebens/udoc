@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+</head>
+<style>
+    h1 {
+        font-size: xxx-large;
+        text-align: center;
+        font-family: Calibri;
+        color: darkred;
+    }
+    h2 {
+        font-size: xx-large;
+        font-style: italic;
+        font-family: Calibri;
+    }
+    main {
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+    }
+    body {
+        margin: 0;
+        width: 100vw;
+    }
+    hr {
+        background-color: black;
+        width: 45%;
+    }
+    section {
+        margin: auto;
+        width: 33%
+    }
+</style>
+<body>
+<main>
+    <h1>{{ title }}</h1>
+    <hr>
+    {{ sections }}
+</main>
+
+</body>
+</html>

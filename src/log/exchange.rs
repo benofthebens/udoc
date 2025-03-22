@@ -19,6 +19,25 @@ impl Exchange {
             .to_lowercase();
         self.title = line;
     }
+    pub fn to_html_file(&self) -> Result<(),std::io::Error>{
+        let mut html = fs::read_to_string("./.udoc/exchange/template.html")?;
+        println!("{}", html);
+        let mut sections = String::new();
+
+        &self.section.iter().for_each(|section| sections.push_str(
+            section.to_html()
+                .unwrap()
+                .as_str()
+        ));
+        println!("{}", sections);
+
+        html = html
+            .replace("{{ title }}", &self.title)
+            .replace("{{ sections }}", sections.as_str());
+
+        fs::write("./exchange.html", html)?;
+        Ok(())
+    }
 }
 pub enum ExchangeItem {
     Title,

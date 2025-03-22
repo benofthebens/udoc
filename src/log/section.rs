@@ -18,6 +18,21 @@ impl Section {
 
         self.heading = line;
     }
+    pub fn to_html(&self) -> Result<String, std::io::Error> {
+        let mut html = String::new();
+
+        html.push_str("<section>\n");
+        html.push_str(format!("\t<h2>{}</h2>\n", self.heading).as_str());
+        html.push_str(format!("\t<p>{}</p>\n", self.text).as_str());
+
+        if let Some(images) = &self.images {
+            html.push_str(images.to_html()?.as_str());
+        }
+
+        html.push_str("</section>\n");
+
+        Ok(html)
+    }
     pub fn set_text(&mut self, text: &String) {
         self.text += text;
     }
