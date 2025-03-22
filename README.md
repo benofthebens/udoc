@@ -12,6 +12,9 @@ This project aims to apply software engineering practices and workflows and git,
     - [Reset](#reset)
     - [Export](#export)
 - [Project Roadmap](#project-roadmap)
+  - [Features](#features)
+  - [Refactor](#refactor)
+  - [Tests](#tests)
 ## Requirements
 - Cargo 1.83.0+ 
 ### Dependencies
@@ -111,6 +114,6 @@ This command will create a html file called exchange.html, which will  represent
 - Make some function instance methods
 - Add functions to Utils modules
 - Add more customisability.
-### Tests 
+### Tests
 - Better use of unit tests across modules.
 - Integration tests using powershell.
